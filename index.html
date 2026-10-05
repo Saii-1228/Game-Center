@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saii-1228 | Pro Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090e;
+            --surface: rgba(25, 25, 35, 0.7);
+            --primary: #00f0ff;
+            --secondary: #ff003c;
+            --text: #e0e0e0;
+            --font-main: 'Poppins', sans-serif;
+            --font-game: 'Orbitron', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #09090e 70%);
+            color: var(--text);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-game);
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Hub Container */
+        #hub-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .hero h1 {
+            font-family: var(--font-game);
+            font-size: 48px;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary), #a200ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Game Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
+        }
+
+        .card h2 {
+            font-family: var(--font-game);
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .btn-play {
+            margin-top: 20px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 25px;
+            font-family: var(--font-game);
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .card:hover .btn-play {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Game Area Overlay */
+        #game-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            padding: 20px;
+        }
+
+        .btn-back {
+            background: var(--secondary);
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            font-family: var(--font-game);
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+        .btn-back:hover { transform: scale(1.05); }
+
+        canvas {
+            background: #000;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            max-width: 100%;
+        }
+
+        /* Memory Game DOM Styles */
+        #memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            gap: 10px;
+            display: none;
+        }
+        .mem-card {
+            width: 80px;
+            height: 80px;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .mem-card.flipped { background: var(--primary); color: #000; }
+        .mem-card.matched { background: #00ff88; border-color: #00ff88; cursor: default; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Saii-1228 Hub</div>
+        <div class="nav-links">
+            <a href="#" onclick="showHub()">Home</a>
+            <a href="https://github.com/Saii-1228" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- Hub Menu -->
+    <main id="hub-container">
+        <div class="hero">
+            <h1>Welcome to the Arcade</h1>
+            <p>Select a game below. Fully playable, zero installation required.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card" onclick="launchGame('snake')">
+                <h2>Neon Snake</h2>
+                <p>Classic snake with a cyber twist. Use Arrow Keys.</p>
+                <button class="btn-play">Play Now</button>
+            </div>
+            <div class="card" onclick="launchGame('pong')">
+                <h2>Cyber Pong</h2>
+                <p>First to 5 wins. Use Mouse to move paddle.</p>
+                <button class="btn-play">Play Now</button>
+            </div>
+            <div class="card" onclick="launchGame('breakout')">
+                <h2>Brick Breaker</h2>
+                <p>Destroy the firewall blocks. Use Mouse.</p>
+                <button class="btn-play">Play Now</button>
+            </div>
+            <div class="card" onclick="launchGame('flappy')">
+                <h2>Flappy Cube</h2>
+                <p>Navigate the neon pipes. Click or Space to jump.</p>
+                <button class="btn-play">Play Now</button>
+            </div>
+            <div class="card" onclick="launchGame('memory')">
+                <h2>Memory Match</h2>
+                <p>Find all the matching tech pairs.</p>
+                <button class="btn-play">Play Now</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Environment -->
+    <div id="game-area">
+        <button class="btn-back" onclick="showHub()">← Quit Game</button>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div id="memory-board"></div>
+    </div>
+
+    <script>
+        // Core Hub Logic
+        const hub = document.getElementById('hub-container');
+        const gameArea = document.getElementById('game-area');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const memBoard = document.getElementById('memory-board');
+        
+        let currentAnimFrame;
+        let activeGame = null;
+
+        function showHub() {
+            hub.style.display = 'block';
+            gameArea.style.display = 'none';
+            if(currentAnimFrame) cancelAnimationFrame(currentAnimFrame);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            activeGame = null;
+            // Clear specific listeners
+            window.onkeydown = null;
+            canvas.onmousemove = null;
+            window.onmousedown = null;
+        }
+
+        function launchGame(game) {
+            hub.style.display = 'none';
+            gameArea.style.display = 'flex';
+            canvas.style.display = game === 'memory' ? 'none' : 'block';
+            memBoard.style.display = game === 'memory' ? 'grid' : 'none';
+            activeGame = game;
+            
+            if(game === 'snake') initSnake();
+            if(game === 'pong') initPong();
+            if(game === 'breakout') initBreakout();
+            if(game === 'flappy') initFlappy();
+            if(game === 'memory') initMemory();
+        }
+
+        // ==========================================
+        // GAME 1: NEON SNAKE
+        // ==========================================
+        function initSnake() {
+            canvas.width = 400; canvas.height = 400;
+            let snake = [{x: 200, y: 200}];
+            let dx = 20, dy = 0;
+            let foodX, foodY;
+            let score = 0;
+
+            function genFood() {
+                foodX = Math.floor(Math.random() * 20) * 20;
+                foodY = Math.floor(Math.random() * 20) * 20;
+            }
+            genFood();
+
+            window.onkeydown = e => {
+                if(e.key === 'ArrowLeft' && dx !== 20) { dx = -20; dy = 0; }
+                if(e.key === 'ArrowUp' && dy !== 20) { dx = 0; dy = -20; }
+                if(e.key === 'ArrowRight' && dx !== -20) { dx = 20; dy = 0; }
+                if(e.key === 'ArrowDown' && dy !== -20) { dx = 0; dy = 20; }
+            };
+
+            let lastTime = 0;
+            function loop(timestamp) {
+                if(activeGame !== 'snake') return;
+                currentAnimFrame = requestAnimationFrame(loop);
+                if(timestamp - lastTime < 100) return; // 10fps
+                lastTime = timestamp;
+
+                let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                
+                // Wall collision
+                if(head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) return launchGame('snake');
+                // Self collision
+                for(let part of snake) if(head.x === part.x && head.y === part.y) return launchGame('snake');
+
+                snake.unshift(head);
+                if(head.x === foodX && head.y === foodY) {
+                    score++; genFood();
+                } else {
+                    snake.pop();
+                }
+
+                ctx.fillStyle = '#09090e';
+                ctx.fillRect(0, 0, 400, 400);
+
+                ctx.fillStyle = '#ff003c';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff003c';
+                ctx.fillRect(foodX, foodY, 18, 18);
+
+                ctx.fillStyle = '#00f0ff';
+                ctx.shadowColor = '#00f0ff';
+                snake.forEach(part => ctx.fillRect(part.x, part.y, 18, 18));
+                
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Orbitron';
+                ctx.fillText(`Score: ${score}`, 10, 30);
+            }
+            currentAnimFrame = requestAnimationFrame(loop);
+        }
+
+        // ==========================================
+        // GAME 2: CYBER PONG
+        // ==========================================
+        function initPong() {
+            canvas.width = 600; canvas.height = 400;
+            let ball = {x: 300, y: 200, dx: 5, dy: 5, r: 8};
+            let p1 = {y: 150, score: 0};
+            let p2 = {y: 150, score: 0};
+            const paddleH = 80, paddleW = 10;
+
+            canvas.onmousemove = e => {
+                let rect = canvas.getBoundingClientRect();
+                p1.y = e.clientY - rect.top - paddleH/2;
+            };
+
+            function resetBall() { ball.x = 300; ball.y = 200; ball.dx = -ball.dx; }
+
+            function loop() {
+                if(activeGame !== 'pong') return;
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; // Trail effect
+                ctx.fillRect(0, 0, 600, 400);
+
+                // AI logic for P2
+                p2.y += (ball.y - (p2.y + paddleH/2)) * 0.08;
+
+                ball.x += ball.dx; ball.y += ball.dy;
+
+                // Wall bounce
+                if(ball.y <= 0 || ball.y >= 400) ball.dy *= -1;
+
+                // Paddle bounce
+                if(ball.x <= 20 && ball.y > p1.y && ball.y < p1.y + paddleH) ball.dx *= -1.1;
+                if(ball.x >= 580 && ball.y > p2.y && ball.y < p2.y + paddleH) ball.dx *= -1.1;
+
+                // Score
+                if(ball.x < 0) { p2.score++; resetBall(); }
+                if(ball.x > 600) { p1.score++; resetBall(); }
+
+                ctx.fillStyle = '#00f0ff';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00f0ff';
+                ctx.fillRect(10, p1.y, paddleW, paddleH);
+                ctx.fillStyle = '#ff003c';
+                ctx.shadowColor = '#ff003c';
+                ctx.fillRect(580, p2.y, paddleW, paddleH);
+                
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.font = '30px Orbitron';
+                ctx.fillText(p1.score, 150, 50);
+                ctx.fillText(p2.score, 450, 50);
+
+                currentAnimFrame = requestAnimationFrame(loop);
+            }
+            currentAnimFrame = requestAnimationFrame(loop);
+        }
+
+        // ==========================================
+        // GAME 3: BRICK BREAKER
+        // ==========================================
+        function initBreakout() {
+            canvas.width = 600; canvas.height = 400;
+            let ball = {x: 300, y: 350, dx: 4, dy: -4, r: 6};
+            let paddle = {x: 250, w: 100, h: 10};
+            let bricks = [];
+            let score = 0;
+            
+            for(let c=0; c<7; c++) {
+                bricks[c] = [];
+                for(let r=0; r<4; r++) {
+                    bricks[c][r] = {x: (c*80)+25, y: (r*30)+30, status: 1};
+                }
+            }
+
+            canvas.onmousemove = e => {
+                let rect = canvas.getBoundingClientRect();
+                paddle.x = e.clientX - rect.left - paddle.w/2;
+            };
+
+            function loop() {
+                if(activeGame !== 'breakout') return;
+                ctx.clearRect(0, 0, 600, 400);
+
+                ball.x += ball.dx; ball.y += ball.dy;
+
+                // Walls
+                if(ball.x + ball.dx > 600 || ball.x + ball.dx < 0) ball.dx = -ball.dx;
+                if(ball.y + ball.dy < 0) ball.dy = -ball.dy;
+                else if(ball.y > 400) return launchGame('breakout'); // Lose
+
+                // Paddle
+                if(ball.y > 380 && ball.x > paddle.x && ball.x < paddle.x + paddle.w) ball.dy = -ball.dy;
+
+                // Draw Paddle
+                ctx.fillStyle = '#00f0ff';
+                ctx.fillRect(paddle.x, 390, paddle.w, paddle.h);
+
+                // Draw Ball
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+
+                // Bricks & Collision
+                let win = true;
+                for(let c=0; c<7; c++) {
+                    for(let r=0; r<4; r++) {
+                        let b = bricks[c][r];
+                        if(b.status === 1) {
+                            win = false;
+                            if(ball.x > b.x && ball.x < b.x+70 && ball.y > b.y && ball.y < b.y+20) {
+                                ball.dy = -ball.dy;
+                                b.status = 0;
+                                score+=10;
+                            }
+                            ctx.fillStyle = r%2 ? '#ff003c' : '#a200ff';
+                            ctx.fillRect(b.x, b.y, 70, 20);
+                        }
+                    }
+                }
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Orbitron';
+                ctx.fillText(`Score: ${score}`, 10, 20);
+
+                if(win) { ctx.fillText("FIREWALL BREACHED - YOU WIN!", 150, 200); return; }
+
+                currentAnimFrame = requestAnimationFrame(loop);
+            }
+            currentAnimFrame = requestAnimationFrame(loop);
+        }
+
+        // ==========================================
+        // GAME 4: FLAPPY CUBE
+        // ==========================================
+        function initFlappy() {
+            canvas.width = 600; canvas.height = 400;
+            let cube = {y: 200, v: 0, gravity: 0.5, jump: -7};
+            let pipes = [];
+            let frameCount = 0;
+            let score = 0;
+
+            window.onmousedown = () => cube.v = cube.jump;
+            window.onkeydown = (e) => { if(e.code === 'Space') cube.v = cube.jump; }
+
+            function loop() {
+                if(activeGame !== 'flappy') return;
+                ctx.fillStyle = '#09090e';
+                ctx.fillRect(0, 0, 600, 400);
+
+                cube.v += cube.gravity;
+                cube.y += cube.v;
+
+                if(frameCount % 90 === 0) {
+                    let gapPos = Math.random() * 200 + 50;
+                    pipes.push({x: 600, w: 50, gap: gapPos, gapSize: 120});
+                }
+
+                pipes.forEach((p, i) => {
+                    p.x -= 4;
+                    // Top pipe
+                    ctx.fillStyle = '#00ff88';
+                    ctx.fillRect(p.x, 0, p.w, p.gap);
+                    // Bottom pipe
+                    ctx.fillRect(p.x, p.gap + p.gapSize, p.w, 400);
+
+                    // Collision
+                    if(100 < p.x + p.w && 120 > p.x && (cube.y < p.gap || cube.y + 20 > p.gap + p.gapSize)) {
+                        return launchGame('flappy'); // Reset
+                    }
+                    if(p.x === 96) score++;
+                });
+
+                if(pipes.length > 0 && pipes[0].x < -50) pipes.shift();
+                if(cube.y > 400 || cube.y < 0) return launchGame('flappy');
+
+                ctx.fillStyle = '#00f0ff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00f0ff';
+                ctx.fillRect(100, cube.y, 20, 20);
+                
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = '30px Orbitron';
+                ctx.fillText(`Data: ${score}`, 10, 40);
+
+                frameCount++;
+                currentAnimFrame = requestAnimationFrame(loop);
+            }
+            currentAnimFrame = requestAnimationFrame(loop);
+        }
+
+        // ==========================================
+        // GAME 5: MEMORY MATCH (DOM Based)
+        // ==========================================
+        function initMemory() {
+            memBoard.innerHTML = '';
+            let icons = ['💻','💻','👾','👾','💾','💾','🔋','🔋','🖱️','🖱️','📡','📡','📱','📱','🕹️','🕹️'];
+            icons.sort(() => 0.5 - Math.random());
+            
+            let flipped = [];
+            let matchedCount = 0;
+
+            icons.forEach((icon, i) => {
+                let el = document.createElement('div');
+                el.classList.add('mem-card');
+                el.dataset.val = icon;
+                el.onclick = () => {
+                    if(flipped.length < 2 && !el.classList.contains('flipped') && !el.classList.contains('matched')) {
+                        el.classList.add('flipped');
+                        el.textContent = icon;
+                        flipped.push(el);
+                        
+                        if(flipped.length === 2) {
+                            setTimeout(() => {
+                                if(flipped[0].dataset.val === flipped[1].dataset.val) {
+                                    flipped[0].classList.add('matched');
+                                    flipped[1].classList.add('matched');
+                                    matchedCount += 2;
+                                    if(matchedCount === 16) alert('All systems online! You win!');
+                                } else {
+                                    flipped[0].classList.remove('flipped');
+                                    flipped[0].textContent = '';
+                                    flipped[1].classList.remove('flipped');
+                                    flipped[1].textContent = '';
+                                }
+                                flipped = [];
+                            }, 800);
+                        }
+                    }
+                };
+                memBoard.appendChild(el);
+            });
+        }
+    </script>
+</body>
+</html>
