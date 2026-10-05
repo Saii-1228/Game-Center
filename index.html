@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Saii-1228 | Pro Gaming Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Firebase V8 SDK for Easy Single-File Integration -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <style>
         :root {
-            --bg: #09090e;
-            --surface: rgba(25, 25, 35, 0.7);
-            --primary: #00f0ff;
-            --secondary: #ff003c;
-            --text: #e0e0e0;
-            --font-main: 'Poppins', sans-serif;
-            --font-game: 'Orbitron', sans-serif;
+            --bg: #09090e; --surface: rgba(25, 25, 35, 0.7);
+            --primary: #00f0ff; --secondary: #ff003c;
+            --text: #e0e0e0; --font-main: 'Poppins', sans-serif; --font-game: 'Orbitron', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
@@ -21,198 +21,89 @@
         body {
             background-color: var(--bg);
             background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #09090e 70%);
-            color: var(--text);
-            font-family: var(--font-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            color: var(--text); font-family: var(--font-main);
+            min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* Navigation */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5vw;
-            background: rgba(10, 10, 15, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5vw; background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky; top: 0; z-index: 100;
         }
-
-        .logo {
-            font-family: var(--font-game);
-            font-size: clamp(18px, 4vw, 24px);
-            font-weight: 900;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--primary);
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: 600;
-            font-size: clamp(14px, 3vw, 16px);
-            transition: 0.3s;
-        }
+        .logo { font-family: var(--font-game); font-size: clamp(18px, 4vw, 24px); font-weight: 900; color: #fff; text-transform: uppercase; text-shadow: 0 0 10px var(--primary); }
+        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: 600; font-size: clamp(14px, 3vw, 16px); transition: 0.3s; }
         .nav-links a:hover { color: var(--primary); }
 
-        /* Containers */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: none; animation: fadeIn 0.5s ease; }
         #hub-container { display: block; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .hero { text-align: center; margin-bottom: 50px; }
-        .hero h1 {
-            font-family: var(--font-game);
-            font-size: clamp(30px, 6vw, 48px);
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--primary), #a200ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .hero h1 { font-family: var(--font-game); font-size: clamp(30px, 6vw, 48px); margin-bottom: 10px; background: linear-gradient(90deg, var(--primary), #a200ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Grid & Cards */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            transition: 0.3s;
-            cursor: pointer;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 30px; text-align: center; transition: 0.3s; cursor: pointer; }
         .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15); }
         .card h2 { font-family: var(--font-game); font-size: 22px; color: #fff; margin-bottom: 10px; }
 
-        /* Pre-Game Menu */
+        /* Lobby & Leaderboard */
         #pregame-container {
-            text-align: center;
-            max-width: 600px;
-            margin: 50px auto;
-            background: var(--surface);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid var(--primary);
+            display: flex; flex-direction: column; align-items: center;
+            max-width: 800px; margin: 50px auto; background: var(--surface);
+            padding: 40px; border-radius: 20px; border: 1px solid var(--primary);
             box-shadow: 0 0 40px rgba(0, 240, 255, 0.1);
         }
-        #pregame-title { font-family: var(--font-game); font-size: 36px; margin-bottom: 20px; color: var(--primary); }
+        #pregame-title { font-family: var(--font-game); font-size: 36px; margin-bottom: 10px; color: var(--primary); }
+        .high-score { font-size: 18px; color: #00ff88; font-family: var(--font-game); margin-bottom: 30px; }
         
-        .difficulty-btns { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
-        .btn {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 12px 25px;
-            font-family: var(--font-game);
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
+        .lobby-content { display: flex; flex-wrap: wrap; gap: 40px; width: 100%; justify-content: center; }
+        .lobby-controls { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px; }
+        
+        .leaderboard-box {
+            flex: 1; min-width: 250px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 20px; text-align: left;
         }
-        .btn:hover, .btn.active { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        .leaderboard-box h3 { font-family: var(--font-game); color: var(--primary); margin-bottom: 15px; text-align: center; }
+        #global-scores-list { list-style: none; font-family: var(--font-game); font-size: 14px; }
+        #global-scores-list li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; }
+        #global-scores-list li span.name { color: #fff; }
+        #global-scores-list li span.score { color: #00ff88; font-weight: bold; }
+
+        .btn {
+            background: transparent; border: 2px solid var(--primary); color: var(--primary);
+            padding: 12px 25px; font-family: var(--font-game); font-size: 16px; font-weight: bold;
+            border-radius: 30px; cursor: pointer; transition: 0.3s; text-transform: uppercase; width: 100%;
+        }
+        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
         .btn-red { border-color: var(--secondary); color: var(--secondary); }
         .btn-red:hover { background: var(--secondary); box-shadow: 0 0 15px var(--secondary); color: #fff;}
-        
-        .high-score { font-size: 18px; color: #00ff88; font-family: var(--font-game); margin-bottom: 20px; }
+        .btn-back-lobby { margin-top: 20px; width: auto; }
 
         /* Game Area */
-        #game-area {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+        #game-area { display: none; flex-direction: column; align-items: center; padding: 20px; }
+        .game-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 15px; }
+        #game-wrapper { position: relative; display: flex; justify-content: center; width: 100%; max-width: 600px; }
+        canvas { background: #000; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); max-width: 100%; height: auto; }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 15px;
+        #game-over-modal {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10, 10, 15, 0.95); border: 2px solid var(--primary); padding: 40px;
+            border-radius: 15px; text-align: center; box-shadow: 0 0 50px rgba(0, 240, 255, 0.4);
+            z-index: 10; flex-direction: column; gap: 15px; min-width: 300px; backdrop-filter: blur(5px);
         }
+        #go-title { font-family: var(--font-game); font-size: 28px; color: var(--primary); }
+        #go-score { font-size: 20px; color: #fff; font-weight: bold; }
+        .modal-btns { display: flex; flex-direction: column; gap: 10px; }
 
-        canvas {
-            background: #000;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Mobile Controls */
-        #mobile-dpad {
-            display: none;
-            grid-template-columns: 60px 60px 60px;
-            grid-template-rows: 60px 60px 60px;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .dpad-btn {
-            background: rgba(0, 240, 255, 0.1);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 24px;
-            user-select: none;
-        }
+        #mobile-dpad { display: none; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px 60px; gap: 10px; margin-top: 20px; }
+        .dpad-btn { background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 24px; user-select: none; }
         .dpad-btn:active { background: rgba(0, 240, 255, 0.4); }
-        #up { grid-column: 2; grid-row: 1; }
-        #left { grid-column: 1; grid-row: 2; }
-        #right { grid-column: 3; grid-row: 2; }
-        #down { grid-column: 2; grid-row: 3; }
+        #up { grid-column: 2; grid-row: 1; } #left { grid-column: 1; grid-row: 2; } #right { grid-column: 3; grid-row: 2; } #down { grid-column: 2; grid-row: 3; }
+        @media (max-width: 768px) { #mobile-dpad { display: grid; } .game-header { flex-direction: column; gap: 10px; align-items: center; } }
 
-        @media (max-width: 768px) {
-            #mobile-dpad { display: grid; } /* Only show Dpad on small screens */
-            .game-header { flex-direction: column; gap: 10px; align-items: center; }
-        }
-
-        /* Memory DOM Styles */
-        #memory-board {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(60px, 80px));
-            gap: 10px;
-            display: none;
-            width: 100%;
-            max-width: 400px;
-            justify-content: center;
-        }
-        .mem-card {
-            aspect-ratio: 1;
-            background: var(--surface);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(24px, 6vw, 32px);
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        #memory-board { display: grid; grid-template-columns: repeat(4, minmax(60px, 80px)); gap: 10px; display: none; width: 100%; justify-content: center; }
+        .mem-card { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: clamp(24px, 6vw, 32px); cursor: pointer; transition: 0.3s; }
         .mem-card.flipped { background: var(--primary); color: #000; }
         .mem-card.matched { background: #00ff88; border-color: #00ff88; cursor: default; }
     </style>
@@ -222,8 +113,8 @@
     <nav>
         <div class="logo">Saii-1228 Hub</div>
         <div class="nav-links">
+            <span id="player-name-display" style="color: var(--primary); margin-right: 20px; font-family: var(--font-game);"></span>
             <a href="#" onclick="showHub()">Home</a>
-            <a href="https://github.com/Saii-1228" target="_blank">GitHub</a>
         </div>
     </nav>
 
@@ -231,61 +122,62 @@
     <main id="hub-container" class="container">
         <div class="hero">
             <h1>Pro Gaming Arcade</h1>
-            <p>Select a game. Choose your difficulty. Beat your high score.</p>
+            <p>Select a game. Choose your difficulty. Conquer the Global Leaderboard.</p>
         </div>
         <div class="grid">
-            <div class="card" onclick="openLobby('snake', 'Neon Snake')">
-                <h2>Neon Snake</h2>
-                <p>Classic snake with a cyber twist.</p>
-                <button class="btn">Play</button>
-            </div>
-            <div class="card" onclick="openLobby('pong', 'Cyber Pong')">
-                <h2>Cyber Pong</h2>
-                <p>First to 5 wins against the AI.</p>
-                <button class="btn">Play</button>
-            </div>
-            <div class="card" onclick="openLobby('breakout', 'Brick Breaker')">
-                <h2>Brick Breaker</h2>
-                <p>Destroy the firewall blocks.</p>
-                <button class="btn">Play</button>
-            </div>
-            <div class="card" onclick="openLobby('flappy', 'Flappy Cube')">
-                <h2>Flappy Cube</h2>
-                <p>Navigate the neon pipes.</p>
-                <button class="btn">Play</button>
-            </div>
-            <div class="card" onclick="openLobby('memory', 'Memory Match')">
-                <h2>Memory Match</h2>
-                <p>Find matching tech pairs against the clock.</p>
-                <button class="btn">Play</button>
-            </div>
+            <div class="card" onclick="openLobby('snake', 'Neon Snake')"><h2>Neon Snake</h2><button class="btn">Play</button></div>
+            <div class="card" onclick="openLobby('pong', 'Cyber Pong')"><h2>Cyber Pong</h2><button class="btn">Play</button></div>
+            <div class="card" onclick="openLobby('breakout', 'Brick Breaker')"><h2>Brick Breaker</h2><button class="btn">Play</button></div>
+            <div class="card" onclick="openLobby('flappy', 'Flappy Cube')"><h2>Flappy Cube</h2><button class="btn">Play</button></div>
+            <div class="card" onclick="openLobby('memory', 'Memory Match')"><h2>Memory Match</h2><button class="btn">Play</button></div>
         </div>
     </main>
 
     <!-- Pre-Game Lobby -->
     <div id="pregame-container" class="container">
         <h1 id="pregame-title">Game Title</h1>
-        <div class="high-score" id="high-score-display">High Score: 0</div>
-        <p>Select Difficulty:</p>
-        <div class="difficulty-btns">
-            <button class="btn" onclick="startGame('easy')">Easy</button>
-            <button class="btn" onclick="startGame('medium')">Medium</button>
-            <button class="btn" onclick="startGame('hard')">Hard</button>
+        <div class="high-score" id="high-score-display">Your Local High Score: 0</div>
+        
+        <div class="lobby-content">
+            <div class="lobby-controls">
+                <p>Select Difficulty:</p>
+                <button class="btn" onclick="startGame('easy')">Easy</button>
+                <button class="btn" onclick="startGame('medium')">Medium</button>
+                <button class="btn" onclick="startGame('hard')">Hard</button>
+                <button class="btn btn-red btn-back-lobby" onclick="showHub()">Cancel</button>
+            </div>
+            
+            <div class="leaderboard-box">
+                <h3>🌍 Global Top 5</h3>
+                <ul id="global-scores-list">
+                    <li>Loading...</li>
+                </ul>
+            </div>
         </div>
-        <button class="btn btn-red" onclick="showHub()">Cancel</button>
     </div>
 
     <!-- Game Area -->
     <div id="game-area" class="container">
         <div class="game-header">
-            <button class="btn btn-red" onclick="showHub()">← Quit</button>
-            <button class="btn" id="pause-btn" onclick="togglePause()">Pause</button>
+            <button class="btn btn-red" style="width: auto;" onclick="showHub()">← Quit</button>
+            <button class="btn" style="width: auto;" id="pause-btn" onclick="togglePause()">Pause</button>
         </div>
         
-        <canvas id="gameCanvas" width="600" height="400"></canvas>
-        <div id="memory-board"></div>
+        <div id="game-wrapper">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+            <div id="memory-board"></div>
+            
+            <div id="game-over-modal">
+                <h2 id="go-title">GAME OVER</h2>
+                <p id="go-score">Final Score: 0</p>
+                <p style="color: var(--primary); font-size: 14px;">Score submitted to global network.</p>
+                <div class="modal-btns">
+                    <button class="btn" onclick="restartGame()">Play Again</button>
+                    <button class="btn btn-red" onclick="showHub()">Exit to Hub</button>
+                </div>
+            </div>
+        </div>
 
-        <!-- On-screen controls for mobile (Only shows for Snake) -->
         <div id="mobile-dpad">
             <div class="dpad-btn" id="up" ontouchstart="simKey('ArrowUp')">▲</div>
             <div class="dpad-btn" id="left" ontouchstart="simKey('ArrowLeft')">◀</div>
@@ -295,7 +187,74 @@
     </div>
 
     <script>
-        // --- Core UI & State Logic ---
+        // ==========================================
+        // 1. ONLINE DATABASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        if(firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // ==========================================
+        // 2. PLAYER & LEADERBOARD LOGIC
+        // ==========================================
+        let playerName = localStorage.getItem('saii_gamer_tag');
+        if(!playerName) {
+            playerName = prompt("Enter your Gamer Tag for the Global Leaderboards:");
+            if(!playerName || playerName.trim() === "") playerName = "Anonymous_Pro";
+            playerName = playerName.substring(0, 12);
+            localStorage.setItem('saii_gamer_tag', playerName);
+        }
+        document.getElementById('player-name-display').textContent = `[ ${playerName} ]`;
+
+        function saveGlobalScore(game, diff, score) {
+            if(firebaseConfig.apiKey === "YOUR_API_KEY") return; // Skips if DB not setup
+            const ref = firebase.database().ref(`leaderboards/${game}`);
+            ref.push({ name: playerName, score: score, diff: diff, timestamp: Date.now() });
+        }
+
+        function loadGlobalScores(game) {
+            const list = document.getElementById('global-scores-list');
+            if(firebaseConfig.apiKey === "YOUR_API_KEY") {
+                list.innerHTML = "<li>Database not connected. Follow setup steps!</li>";
+                return;
+            }
+            list.innerHTML = '<li>Syncing...</li>';
+            
+            firebase.database().ref(`leaderboards/${game}`)
+                .orderByChild('score')
+                .limitToLast(5)
+                .once('value', snapshot => {
+                    let data = [];
+                    snapshot.forEach(child => { data.unshift(child.val()); }); // highest first
+                    
+                    if(data.length === 0) {
+                        list.innerHTML = '<li>No scores yet. Be the first!</li>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.forEach((entry, i) => {
+                        html += `<li><span class="name">${i+1}. ${entry.name} (${entry.diff.charAt(0).toUpperCase()})</span> <span class="score">${entry.score}</span></li>`;
+                    });
+                    list.innerHTML = html;
+                });
+        }
+
+
+        // ==========================================
+        // 3. CORE UI & STATE
+        // ==========================================
         const hub = document.getElementById('hub-container');
         const lobby = document.getElementById('pregame-container');
         const gameArea = document.getElementById('game-area');
@@ -303,107 +262,76 @@
         const ctx = canvas.getContext('2d');
         const memBoard = document.getElementById('memory-board');
         const dpad = document.getElementById('mobile-dpad');
+        const gameOverModal = document.getElementById('game-over-modal');
         
-        let currentAnimFrame;
-        let activeGame = null;
-        let activeDiff = 'easy';
-        let isPaused = false;
+        let currentAnimFrame, activeGame = null, activeDiff = 'easy', isPaused = false, isGameOver = false;
         
-        // High Score Management
-        function getHighScore(game, diff) { return localStorage.getItem(`${game}_${diff}`) || 0; }
-        function setHighScore(game, diff, score) {
-            let current = getHighScore(game, diff);
-            if(score > current) localStorage.setItem(`${game}_${diff}`, score);
-        }
-
+        function getHighScore(game) { return localStorage.getItem(`${game}_high`) || 0; }
+        
         function showHub() {
-            hub.style.display = 'block';
-            lobby.style.display = 'none';
-            gameArea.style.display = 'none';
-            isPaused = false;
+            hub.style.display = 'block'; lobby.style.display = 'none'; gameArea.style.display = 'none';
+            gameOverModal.style.display = 'none'; isPaused = false; isGameOver = false;
             if(currentAnimFrame) cancelAnimationFrame(currentAnimFrame);
-            
-            // Clean up event listeners to prevent duplication bugs
-            window.onkeydown = null;
-            canvas.onmousemove = null;
-            canvas.ontouchmove = null;
-            window.onmousedown = null;
-            window.ontouchstart = null;
+            window.onkeydown = null; canvas.onmousemove = null; canvas.ontouchmove = null; window.onmousedown = null; window.ontouchstart = null;
         }
 
         function openLobby(gameId, title) {
-            activeGame = gameId;
-            hub.style.display = 'none';
-            lobby.style.display = 'block';
+            activeGame = gameId; hub.style.display = 'none'; lobby.style.display = 'flex';
             document.getElementById('pregame-title').textContent = title;
-            updateHighScoreDisplay('medium'); // Default preview
-        }
-
-        function updateHighScoreDisplay(diff) {
-            document.getElementById('high-score-display').textContent = 
-                `${diff.toUpperCase()} High Score: ${getHighScore(activeGame, diff)}`;
+            document.getElementById('high-score-display').textContent = `Your Top Score: ${getHighScore(activeGame)}`;
+            loadGlobalScores(activeGame); // Fetch online scores
         }
 
         function startGame(diff) {
-            activeDiff = diff;
-            lobby.style.display = 'none';
-            gameArea.style.display = 'flex';
-            isPaused = false;
+            activeDiff = diff; lobby.style.display = 'none'; gameArea.style.display = 'flex';
+            gameOverModal.style.display = 'none'; isPaused = false; isGameOver = false;
             document.getElementById('pause-btn').textContent = "Pause";
-            
-            // UI Toggles based on game
             canvas.style.display = activeGame === 'memory' ? 'none' : 'block';
             memBoard.style.display = activeGame === 'memory' ? 'grid' : 'none';
             dpad.style.display = (activeGame === 'snake' && window.innerWidth <= 768) ? 'grid' : 'none';
-            
-            if(activeGame === 'snake') initSnake();
-            if(activeGame === 'pong') initPong();
-            if(activeGame === 'breakout') initBreakout();
-            if(activeGame === 'flappy') initFlappy();
-            if(activeGame === 'memory') initMemory();
+            if(currentAnimFrame) cancelAnimationFrame(currentAnimFrame);
+            if(activeGame === 'snake') initSnake(); if(activeGame === 'pong') initPong(); if(activeGame === 'breakout') initBreakout(); if(activeGame === 'flappy') initFlappy(); if(activeGame === 'memory') initMemory();
         }
 
+        function restartGame() { startGame(activeDiff); }
         function togglePause() {
-            isPaused = !isPaused;
-            document.getElementById('pause-btn').textContent = isPaused ? "Resume" : "Pause";
+            if(isGameOver) return;
+            isPaused = !isPaused; document.getElementById('pause-btn').textContent = isPaused ? "Resume" : "Pause";
             if(!isPaused && activeGame !== 'memory') currentAnimFrame = requestAnimationFrame(window[`loop_${activeGame}`]);
         }
 
-        // Simulates keyboard presses for on-screen mobile D-pad
-        function simKey(key) {
-            if(window.onkeydown) window.onkeydown({key: key, preventDefault:()=>{}});
+        function showGameOver(score, title = "GAME OVER") {
+            isGameOver = true; isPaused = true; cancelAnimationFrame(currentAnimFrame);
+            
+            // Local Save
+            let currentBest = getHighScore(activeGame);
+            if(score > currentBest) localStorage.setItem(`${activeGame}_high`, score);
+            
+            // Global Save
+            saveGlobalScore(activeGame, activeDiff, score);
+            
+            document.getElementById('go-title').textContent = title;
+            document.getElementById('go-score').textContent = `Final Score: ${score}`;
+            document.getElementById('go-title').style.color = title === "GAME OVER" ? 'var(--secondary)' : 'var(--primary)';
+            gameOverModal.style.display = 'flex';
         }
 
-        // Utility to map touch coordinates to canvas scale
+        function simKey(key) { if(window.onkeydown) window.onkeydown({key: key, preventDefault:()=>{}}); }
         function getCanvasPos(e) {
-            let rect = canvas.getBoundingClientRect();
-            let touch = e.touches ? e.touches[0] : e;
-            let scaleX = canvas.width / rect.width;
-            let scaleY = canvas.height / rect.height;
-            return {
-                x: (touch.clientX - rect.left) * scaleX,
-                y: (touch.clientY - rect.top) * scaleY
-            };
+            let rect = canvas.getBoundingClientRect(); let touch = e.touches ? e.touches[0] : e;
+            return { x: (touch.clientX - rect.left) * (canvas.width / rect.width), y: (touch.clientY - rect.top) * (canvas.height / rect.height) };
         }
 
         // ==========================================
-        // GAME 1: NEON SNAKE
+        // 4. THE GAMES
         // ==========================================
-        window.loop_snake = null; // Global reference for pause/resume
+
+        window.loop_snake = null;
         function initSnake() {
             canvas.width = 400; canvas.height = 400;
-            let snake = [{x: 200, y: 200}];
-            let dx = 20, dy = 0;
-            let foodX, foodY;
-            let score = 0;
-            
-            // Difficulty parsing
+            let snake = [{x: 200, y: 200}], dx = 20, dy = 0, foodX, foodY, score = 0;
             let fps = activeDiff === 'easy' ? 8 : (activeDiff === 'medium' ? 15 : 22);
-
-            function genFood() {
-                foodX = Math.floor(Math.random() * 20) * 20;
-                foodY = Math.floor(Math.random() * 20) * 20;
-            }
+            function genFood() { foodX = Math.floor(Math.random() * 20) * 20; foodY = Math.floor(Math.random() * 20) * 20; }
             genFood();
 
             window.onkeydown = e => {
@@ -415,151 +343,90 @@
 
             let lastTime = 0;
             window.loop_snake = function(timestamp) {
-                if(activeGame !== 'snake' || isPaused) return;
-                currentAnimFrame = requestAnimationFrame(window.loop_snake);
-                if(timestamp - lastTime < 1000/fps) return; 
+                if(isGameOver || isPaused || activeGame !== 'snake') return;
+                if(timestamp - lastTime < 1000/fps) { currentAnimFrame = requestAnimationFrame(window.loop_snake); return; }
                 lastTime = timestamp;
 
                 let head = {x: snake[0].x + dx, y: snake[0].y + dy};
-                
-                // Wall collision
-                if(head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) return gameOver(score);
-                // Self collision
-                for(let part of snake) if(head.x === part.x && head.y === part.y) return gameOver(score);
+                if(head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) return showGameOver(score);
+                for(let part of snake) if(head.x === part.x && head.y === part.y) return showGameOver(score);
 
                 snake.unshift(head);
-                if(head.x === foodX && head.y === foodY) {
-                    score++; genFood();
-                } else { snake.pop(); }
+                if(head.x === foodX && head.y === foodY) { score++; genFood(); } else { snake.pop(); }
 
-                ctx.fillStyle = '#09090e';
-                ctx.fillRect(0, 0, 400, 400);
-
-                ctx.fillStyle = '#ff003c';
-                ctx.shadowBlur = 10; ctx.shadowColor = '#ff003c';
-                ctx.fillRect(foodX, foodY, 18, 18);
-
-                ctx.fillStyle = '#00f0ff';
-                ctx.shadowColor = '#00f0ff';
-                snake.forEach((part, i) => {
-                    ctx.fillStyle = i === 0 ? '#fff' : '#00f0ff'; // White head
-                    ctx.fillRect(part.x, part.y, 18, 18)
-                });
-                
-                drawScore(score);
+                ctx.fillStyle = '#09090e'; ctx.fillRect(0, 0, 400, 400);
+                ctx.fillStyle = '#ff003c'; ctx.shadowBlur = 10; ctx.shadowColor = '#ff003c'; ctx.fillRect(foodX, foodY, 18, 18);
+                ctx.fillStyle = '#00f0ff'; ctx.shadowColor = '#00f0ff';
+                snake.forEach((part, i) => { ctx.fillStyle = i===0 ? '#fff':'#00f0ff'; ctx.fillRect(part.x, part.y, 18, 18); });
+                drawScore(score); currentAnimFrame = requestAnimationFrame(window.loop_snake);
             };
             currentAnimFrame = requestAnimationFrame(window.loop_snake);
         }
 
-        // ==========================================
-        // GAME 2: CYBER PONG
-        // ==========================================
         window.loop_pong = null;
         function initPong() {
             canvas.width = 600; canvas.height = 400;
             let spd = activeDiff === 'easy' ? 4 : (activeDiff === 'medium' ? 7 : 10);
             let aiSpd = activeDiff === 'easy' ? 0.04 : (activeDiff === 'medium' ? 0.08 : 0.15);
-            
-            let ball = {x: 300, y: 200, dx: spd, dy: spd, r: 8};
-            let p1 = {y: 150, score: 0};
-            let p2 = {y: 150, score: 0};
-            let paddleH = activeDiff === 'hard' ? 60 : 80;
-            let paddleW = 10;
+            let ball = {x: 300, y: 200, dx: spd, dy: spd, r: 8}, p1 = {y: 150, score: 0}, p2 = {y: 150, score: 0};
+            let paddleH = activeDiff === 'hard' ? 60 : 80, paddleW = 10;
 
             const movePaddle = e => { e.preventDefault(); p1.y = getCanvasPos(e).y - paddleH/2; };
-            canvas.onmousemove = movePaddle;
-            canvas.ontouchmove = movePaddle;
-
+            canvas.onmousemove = movePaddle; canvas.ontouchmove = movePaddle;
             function resetBall() { ball.x = 300; ball.y = 200; ball.dx = -ball.dx; }
 
             window.loop_pong = function() {
-                if(activeGame !== 'pong' || isPaused) return;
-                
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fillRect(0, 0, 600, 400);
+                if(isGameOver || isPaused || activeGame !== 'pong') return;
+                ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, 0, 600, 400);
 
-                p2.y += (ball.y - (p2.y + paddleH/2)) * aiSpd;
-
-                ball.x += ball.dx; ball.y += ball.dy;
+                p2.y += (ball.y - (p2.y + paddleH/2)) * aiSpd; ball.x += ball.dx; ball.y += ball.dy;
 
                 if(ball.y <= 0 || ball.y >= 400) ball.dy *= -1;
-
                 if(ball.x <= 20 && ball.y > p1.y && ball.y < p1.y + paddleH) ball.dx = Math.abs(ball.dx) * 1.05;
                 if(ball.x >= 580 && ball.y > p2.y && ball.y < p2.y + paddleH) ball.dx = -Math.abs(ball.dx) * 1.05;
 
                 if(ball.x < 0) { p2.score++; resetBall(); }
                 if(ball.x > 600) { p1.score++; resetBall(); }
 
-                if(p1.score >= 5) { setHighScore('pong', activeDiff, 1); alert("You Win!"); return showHub(); }
-                if(p2.score >= 5) { alert("AI Wins!"); return showHub(); }
+                let scoreMultiplier = activeDiff === 'hard' ? 300 : (activeDiff === 'medium' ? 100 : 50);
+                if(p1.score >= 5) return showGameOver(scoreMultiplier, "YOU WIN!");
+                if(p2.score >= 5) return showGameOver(0, "AI WINS!");
 
-                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f0ff';
-                ctx.fillRect(10, p1.y, paddleW, paddleH);
-                ctx.fillStyle = '#ff003c'; ctx.shadowColor = '#ff003c';
-                ctx.fillRect(580, p2.y, paddleW, paddleH);
-                
-                ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-                ctx.fillStyle = '#fff'; ctx.fill();
-
-                ctx.shadowBlur = 0; ctx.font = '30px Orbitron';
-                ctx.fillText(p1.score, 150, 50); ctx.fillText(p2.score, 450, 50);
-                
-                // Draw center line
-                ctx.setLineDash([10, 15]); ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(300, 400);
-                ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.stroke(); ctx.setLineDash([]);
-
+                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 15; ctx.shadowColor = '#00f0ff'; ctx.fillRect(10, p1.y, paddleW, paddleH);
+                ctx.fillStyle = '#ff003c'; ctx.shadowColor = '#ff003c'; ctx.fillRect(580, p2.y, paddleW, paddleH);
+                ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+                ctx.shadowBlur = 0; ctx.font = '30px Orbitron'; ctx.fillText(p1.score, 150, 50); ctx.fillText(p2.score, 450, 50);
+                ctx.setLineDash([10, 15]); ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(300, 400); ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.stroke(); ctx.setLineDash([]);
                 currentAnimFrame = requestAnimationFrame(window.loop_pong);
             };
             currentAnimFrame = requestAnimationFrame(window.loop_pong);
         }
 
-        // ==========================================
-        // GAME 3: BRICK BREAKER
-        // ==========================================
         window.loop_breakout = null;
         function initBreakout() {
             canvas.width = 600; canvas.height = 400;
-            let spd = activeDiff === 'easy' ? 4 : (activeDiff === 'medium' ? 6 : 8);
-            let padW = activeDiff === 'hard' ? 70 : 100;
-            
-            let ball = {x: 300, y: 350, dx: spd, dy: -spd, r: 6};
-            let paddle = {x: 250, w: padW, h: 10};
-            let bricks = [];
-            let score = 0;
+            let spd = activeDiff === 'easy' ? 4 : (activeDiff === 'medium' ? 6 : 8), padW = activeDiff === 'hard' ? 70 : 100;
+            let ball = {x: 300, y: 350, dx: spd, dy: -spd, r: 6}, paddle = {x: 250, w: padW, h: 10}, bricks = [], score = 0;
             let rows = activeDiff === 'easy' ? 3 : (activeDiff === 'medium' ? 5 : 6);
-            
-            for(let c=0; c<7; c++) {
-                bricks[c] = [];
-                for(let r=0; r<rows; r++) { bricks[c][r] = {x: (c*80)+25, y: (r*30)+40, status: 1}; }
-            }
+            for(let c=0; c<7; c++) { bricks[c] = []; for(let r=0; r<rows; r++) bricks[c][r] = {x: (c*80)+25, y: (r*30)+40, status: 1}; }
 
             const movePaddle = e => { e.preventDefault(); paddle.x = getCanvasPos(e).x - paddle.w/2; };
-            canvas.onmousemove = movePaddle;
-            canvas.ontouchmove = movePaddle;
+            canvas.onmousemove = movePaddle; canvas.ontouchmove = movePaddle;
 
             window.loop_breakout = function() {
-                if(activeGame !== 'breakout' || isPaused) return;
+                if(isGameOver || isPaused || activeGame !== 'breakout') return;
                 ctx.clearRect(0, 0, 600, 400);
-
                 ball.x += ball.dx; ball.y += ball.dy;
 
                 if(ball.x + ball.dx > 600 || ball.x + ball.dx < 0) ball.dx = -ball.dx;
-                if(ball.y + ball.dy < 0) ball.dy = -ball.dy;
-                else if(ball.y > 400) return gameOver(score); 
+                if(ball.y + ball.dy < 0) ball.dy = -ball.dy; else if(ball.y > 400) return showGameOver(score); 
 
-                // Paddle collision (added English/spin based on hit location)
                 if(ball.y > 380 && ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
-                    ball.dy = -ball.dy;
-                    let hitPoint = ball.x - (paddle.x + paddle.w/2);
-                    ball.dx = hitPoint * 0.15; // Dynamic bounce angle
+                    ball.dy = -ball.dy; ball.dx = (ball.x - (paddle.x + paddle.w/2)) * 0.15; 
                 }
 
-                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 10; ctx.shadowColor = '#00f0ff';
-                ctx.fillRect(paddle.x, 390, paddle.w, paddle.h);
-
-                ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-                ctx.fillStyle = '#fff'; ctx.fill();
-                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 10; ctx.shadowColor = '#00f0ff'; ctx.fillRect(paddle.x, 390, paddle.w, paddle.h);
+                ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.shadowBlur = 0;
 
                 let win = true;
                 for(let c=0; c<7; c++) {
@@ -570,139 +437,80 @@
                             if(ball.x > b.x && ball.x < b.x+70 && ball.y > b.y && ball.y < b.y+20) {
                                 ball.dy = -ball.dy; b.status = 0; score+=10;
                             }
-                            ctx.fillStyle = r%2 ? '#ff003c' : '#a200ff';
-                            ctx.fillRect(b.x, b.y, 70, 20);
+                            ctx.fillStyle = r%2 ? '#ff003c' : '#a200ff'; ctx.fillRect(b.x, b.y, 70, 20);
                         }
                     }
                 }
-                
                 drawScore(score);
-                if(win) { setHighScore('breakout', activeDiff, score); alert("FIREWALL BREACHED - YOU WIN!"); showHub(); return; }
-
+                if(win) return showGameOver(score + (activeDiff === 'hard'? 500:0), "FIREWALL BREACHED!");
                 currentAnimFrame = requestAnimationFrame(window.loop_breakout);
             };
             currentAnimFrame = requestAnimationFrame(window.loop_breakout);
         }
 
-        // ==========================================
-        // GAME 4: FLAPPY CUBE
-        // ==========================================
         window.loop_flappy = null;
         function initFlappy() {
             canvas.width = 600; canvas.height = 400;
-            let gap = activeDiff === 'easy' ? 140 : (activeDiff === 'medium' ? 110 : 85);
-            let speed = activeDiff === 'hard' ? 5 : 4;
-            
-            let cube = {y: 200, v: 0, gravity: 0.5, jump: -7};
-            let pipes = [];
-            let frameCount = 0;
-            let score = 0;
+            let gap = activeDiff === 'easy' ? 140 : (activeDiff === 'medium' ? 110 : 85), speed = activeDiff === 'hard' ? 5 : 4;
+            let cube = {y: 200, v: 0, gravity: 0.5, jump: -7}, pipes = [], frameCount = 0, score = 0;
 
             const doJump = (e) => { e.preventDefault(); cube.v = cube.jump; };
-            window.onmousedown = doJump;
-            window.ontouchstart = doJump;
-            window.onkeydown = (e) => { if(e.code === 'Space') doJump(e); };
+            window.onmousedown = doJump; window.ontouchstart = doJump; window.onkeydown = (e) => { if(e.code === 'Space') doJump(e); };
 
             window.loop_flappy = function() {
-                if(activeGame !== 'flappy' || isPaused) return;
-                ctx.fillStyle = '#09090e';
-                ctx.fillRect(0, 0, 600, 400);
-
+                if(isGameOver || isPaused || activeGame !== 'flappy') return;
+                ctx.fillStyle = '#09090e'; ctx.fillRect(0, 0, 600, 400);
                 cube.v += cube.gravity; cube.y += cube.v;
 
                 if(frameCount % (Math.floor(100/speed)*2) === 0) {
-                    let gapPos = Math.random() * (400 - gap - 60) + 30;
-                    pipes.push({x: 600, w: 50, gap: gapPos, gapSize: gap});
+                    let gapPos = Math.random() * (400 - gap - 60) + 30; pipes.push({x: 600, w: 50, gap: gapPos, gapSize: gap});
+                }
+                for(let p of pipes) {
+                    p.x -= speed;
+                    ctx.fillStyle = '#00ff88'; ctx.fillRect(p.x, 0, p.w, p.gap); ctx.fillRect(p.x, p.gap + p.gapSize, p.w, 400);
+                    if(100 < p.x + p.w && 120 > p.x && (cube.y < p.gap || cube.y + 20 > p.gap + p.gapSize)) return showGameOver(score);
+                    if(p.x === (100 - speed)) score++; 
                 }
 
-                pipes.forEach((p, i) => {
-                    p.x -= speed;
-                    ctx.fillStyle = '#00ff88';
-                    ctx.fillRect(p.x, 0, p.w, p.gap); // Top
-                    ctx.fillRect(p.x, p.gap + p.gapSize, p.w, 400); // Bottom
-
-                    // Hitbox logic
-                    if(100 < p.x + p.w && 120 > p.x && (cube.y < p.gap || cube.y + 20 > p.gap + p.gapSize)) return gameOver(score);
-                    if(p.x === (100 - speed)) score++; 
-                });
-
                 if(pipes.length > 0 && pipes[0].x < -50) pipes.shift();
-                if(cube.y > 400 || cube.y < 0) return gameOver(score);
+                if(cube.y > 400 || cube.y < 0) return showGameOver(score);
 
-                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 10; ctx.shadowColor = '#00f0ff';
-                ctx.fillRect(100, cube.y, 20, 20); ctx.shadowBlur = 0;
-                
-                drawScore(score);
-
-                frameCount++;
-                currentAnimFrame = requestAnimationFrame(window.loop_flappy);
+                ctx.fillStyle = '#00f0ff'; ctx.shadowBlur = 10; ctx.shadowColor = '#00f0ff'; ctx.fillRect(100, cube.y, 20, 20); ctx.shadowBlur = 0;
+                drawScore(score); frameCount++; currentAnimFrame = requestAnimationFrame(window.loop_flappy);
             };
             currentAnimFrame = requestAnimationFrame(window.loop_flappy);
         }
 
-        // ==========================================
-        // GAME 5: MEMORY MATCH
-        // ==========================================
         let memTimerInterval;
         function initMemory() {
-            memBoard.innerHTML = '';
-            clearInterval(memTimerInterval);
+            memBoard.innerHTML = ''; clearInterval(memTimerInterval);
+            let timeLimit = activeDiff === 'easy' ? 999 : (activeDiff === 'medium' ? 60 : 40), timeRemaining = timeLimit, score = 0;
             
-            let timeLimit = activeDiff === 'easy' ? 999 : (activeDiff === 'medium' ? 60 : 40);
-            let timeRemaining = timeLimit;
-            let score = 0;
-            
-            // UI setup for timer
-            const header = document.querySelector('.game-header');
-            let timerDiv = document.getElementById('mem-timer');
-            if(!timerDiv) {
-                timerDiv = document.createElement('div');
-                timerDiv.id = 'mem-timer';
-                timerDiv.style.cssText = "color: #fff; font-family: 'Orbitron'; font-size: 20px;";
-                header.appendChild(timerDiv);
-            }
+            const header = document.querySelector('.game-header'); let timerDiv = document.getElementById('mem-timer');
+            if(!timerDiv) { timerDiv = document.createElement('div'); timerDiv.id = 'mem-timer'; timerDiv.style.cssText = "color: #fff; font-family: 'Orbitron'; font-size: 20px;"; header.appendChild(timerDiv); }
             
             const updateTimer = () => {
-                if(isPaused) return;
+                if(isPaused || isGameOver) return;
                 timerDiv.textContent = timeLimit === 999 ? "No Time Limit" : `Time: ${timeRemaining}s`;
-                if(timeLimit !== 999) {
-                    timeRemaining--;
-                    if(timeRemaining < 0) { clearInterval(memTimerInterval); alert("Time's Up!"); showHub(); }
-                }
+                if(timeLimit !== 999) { timeRemaining--; if(timeRemaining < 0) { clearInterval(memTimerInterval); showGameOver(score, "TIME'S UP!"); } }
             };
-            updateTimer();
-            memTimerInterval = setInterval(updateTimer, 1000);
+            updateTimer(); memTimerInterval = setInterval(updateTimer, 1000);
 
-            let baseIcons = ['💻','👾','💾','🔋','🖱️','📡','📱','🕹️'];
-            // Dynamic difficulty could add more cards, but sticking to 4x4 (16 cards) to ensure mobile fit.
-            let icons = [...baseIcons, ...baseIcons]; 
-            icons.sort(() => 0.5 - Math.random());
-            
-            let flipped = [];
-            let matchedCount = 0;
+            let baseIcons = ['💻','👾','💾','🔋','🖱️','📡','📱','🕹️'], icons = [...baseIcons, ...baseIcons]; icons.sort(() => 0.5 - Math.random());
+            let flipped = [], matchedCount = 0;
 
             icons.forEach((icon) => {
-                let el = document.createElement('div');
-                el.classList.add('mem-card');
-                el.dataset.val = icon;
+                let el = document.createElement('div'); el.classList.add('mem-card'); el.dataset.val = icon;
                 el.onclick = () => {
-                    if(isPaused) return;
+                    if(isPaused || isGameOver) return;
                     if(flipped.length < 2 && !el.classList.contains('flipped') && !el.classList.contains('matched')) {
-                        el.classList.add('flipped');
-                        el.textContent = icon;
-                        flipped.push(el);
-                        
+                        el.classList.add('flipped'); el.textContent = icon; flipped.push(el);
                         if(flipped.length === 2) {
                             setTimeout(() => {
                                 if(flipped[0].dataset.val === flipped[1].dataset.val) {
                                     flipped[0].classList.add('matched'); flipped[1].classList.add('matched');
                                     matchedCount += 2; score += 10;
-                                    if(matchedCount === icons.length) {
-                                        score += timeRemaining; // Bonus points for speed
-                                        setHighScore('memory', activeDiff, score);
-                                        clearInterval(memTimerInterval);
-                                        alert(`Systems Online! Score: ${score}`); showHub();
-                                    }
+                                    if(matchedCount === icons.length) { score += (timeRemaining * 10); clearInterval(memTimerInterval); showGameOver(score, "SYSTEMS ONLINE!"); }
                                 } else {
                                     flipped[0].classList.remove('flipped'); flipped[0].textContent = '';
                                     flipped[1].classList.remove('flipped'); flipped[1].textContent = '';
@@ -714,34 +522,15 @@
                 };
                 memBoard.appendChild(el);
             });
-            
-            // Clean up timer when quitting
-            const oldQuit = document.querySelector('.game-header .btn-red').onclick;
-            document.querySelector('.game-header .btn-red').onclick = () => {
-                clearInterval(memTimerInterval);
-                if(timerDiv) timerDiv.remove();
-                showHub();
-            }
+            const quitBtn = document.querySelector('.game-header .btn-red');
+            quitBtn.onclick = () => { clearInterval(memTimerInterval); if(timerDiv) timerDiv.remove(); showHub(); }
         }
 
-        // --- Shared Game Utilities ---
         function drawScore(score) {
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#fff';
-            ctx.font = '20px Orbitron';
-            ctx.fillText(`Score: ${score}`, 10, 30);
-            
-            let top = getHighScore(activeGame, activeDiff);
-            ctx.font = '14px Orbitron';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillText(`Top: ${Math.max(score, top)}`, 10, 50);
-        }
-
-        function gameOver(score) {
-            setHighScore(activeGame, activeDiff, score);
-            alert(`GAME OVER! Final Score: ${score}`);
-            showHub();
+            ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.font = '20px Orbitron'; ctx.fillText(`Score: ${score}`, 10, 30);
         }
     </script>
 </body>
 </html>
+
+            
